@@ -156,8 +156,10 @@ class PaylineProcessor(object):
                 res.transaction.id,
                 res.result.shortMessage + ': ' + res.result.longMessage)
 
-    def make_web_payment(self, order_ref, amount):
+    def make_web_payment(self, order_ref, amount, buyer=None):
         amount_cents = int(float(amount) * 100)
+
+        # Payment information
         payment = self.client.factory.create('ns1:payment')
         payment.amount = amount_cents
         payment.currency = self.currency_code
@@ -165,12 +167,39 @@ class PaylineProcessor(object):
         payment.mode = 'CPT'
         payment.contractNumber = self.vad_number
 
+        # Order information
         order = self.client.factory.create('ns1:order')
         order.ref = order_ref
         order.amount = amount_cents
         order.currency = self.currency_code
         order.date = datetime.now().strftime("%d/%m/%Y %H:%M")
 
+        # Buyer information (if any)
+        buyer_obj = buyer or {}
+        buyer = self.client.factory.create('ns1:buyer')
+        buyer.lastName = buyer_obj.get('first_name')
+        buyer.firstName = buyer_obj.get('last_name')
+        buyer.email = buyer_obj.get('email')
+        #shipping_address = buyer_obj.get('shipping_address', {})
+        #buyer.shippingAddress.name = shipping_address.get('name')
+        #buyer.shippingAddress.street1
+        #buyer.shippingAddress.street2
+        #buyer.shippingAddress.cityName
+        #buyer.shippingAddress.zipCode
+        #buyer.shippingAddress.country
+        #buyer.shippingAddress.phone
+        #buyer.accountCreateDate
+        #buyer.accountAverageAmount
+        #buyer.accountOrderCount
+        #buyer.walletId
+        #buyer.walletDisplayed
+        #buyer.walletSecured
+        #buyer.walletCardInd
+        buyer.ip = buyer_obj.get('ip')
+        #buyer.mobilePhone = buyer_obj.get('mobile_phone')
+        #buyer.customerId = buyer_obj.get('id')
+
+        # URLs
         return_url = getattr(settings, 'PAYLINE_RETURN_URL', '')
         cancel_url = getattr(settings, 'PAYLINE_CANCEL_URL', '')
         notification_url = getattr(settings, 'PAYLINE_NOTIFICATION_URL', '')
@@ -178,6 +207,7 @@ class PaylineProcessor(object):
         try:
             result = self.client.service.doWebPayment(
                 payment=payment,
+                buyer=buyer,
                 returnURL=return_url,
                 cancelURL=cancel_url,
                 order=order,

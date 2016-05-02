@@ -111,6 +111,7 @@ class WebPaymentForm(forms.ModelForm):
         self.redirect_url = None
         self.amount = kwargs.pop('amount')
         self.order_ref = kwargs.pop('order_ref')
+        self.buyer = kwargs.pop('buyer')
         super(WebPaymentForm, self).__init__(*args, **kwargs)
         self.fields['amount'].required = False
         self.fields['amount'].widget = forms.HiddenInput()
@@ -119,7 +120,11 @@ class WebPaymentForm(forms.ModelForm):
 
     def clean_token(self):
         pp = PaylineProcessor()
-        success, result = pp.make_web_payment(self.order_ref, self.amount)
+        success, result = pp.make_web_payment(
+            order_ref=self.order_ref,
+            amount=self.amount,
+            buyer=self.buyer,
+            )
         if success:
             token = result.token
             self.redirect_url = result.redirectURL

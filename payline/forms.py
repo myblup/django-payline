@@ -111,7 +111,7 @@ class WebPaymentForm(forms.ModelForm):
         self.redirect_url = None
         self.amount = kwargs.pop('amount')
         self.order_ref = kwargs.pop('order_ref')
-        self.buyer = kwargs.pop('buyer')
+        self.buyer = kwargs.pop('buyer', '')
         super(WebPaymentForm, self).__init__(*args, **kwargs)
         self.fields['amount'].required = False
         self.fields['amount'].widget = forms.HiddenInput()

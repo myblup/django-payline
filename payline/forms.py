@@ -41,7 +41,10 @@ class WalletForm(forms.ModelForm):
 
     class Meta:
         model = Wallet
-
+        fields = [
+            "first_name", "last_name", 
+            "card_number", "card_type", "card_expiry"
+            ]
     def __init__(self, *args, **kwargs):
         super(WalletForm, self).__init__(*args, **kwargs)
         self.pp = PaylineProcessor()

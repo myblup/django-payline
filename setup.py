@@ -28,7 +28,7 @@ setup(
     author_email='mathieu.agopian@gmail.com',
     packages=find_packages(),
     include_package_data=True,
-    url='https://github.com/magopian/django-payline',
+    url='https://github.com/myblup/django-payline',
     license='BSD licence, see LICENSE file',
     description='Payments using Payline',
     long_description=read('README.rst'),

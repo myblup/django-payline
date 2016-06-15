@@ -11,7 +11,6 @@ DATABASES = {
 
 INSTALLED_APPS = [
     'django.contrib.contenttypes',
-    'south',
     'payline',
 ]
 

@@ -15,6 +15,9 @@ from suds.client import Client
 
 logger = getLogger('payline')
 
+#API_VERSION = "4.38" # version en cours (d'après les dates) quand les wsdl ont été intégrés au repo
+API_VERSION = "4.60" # version courante (selon payline https://support.payline.com/hc/fr/articles/360000836848-Historique-de-version-de-l-API)
+
 
 class PaylineProcessor(object):
     """Payline Payment Backend."""
@@ -26,7 +29,7 @@ class PaylineProcessor(object):
 
     def __init__(self):
         """Instantiate suds client."""
-        wsdl_dir = path.join(path.abspath(path.dirname(__file__)), 'wsdl/v4_0')
+        wsdl_dir = path.join(path.abspath(path.dirname(__file__)), 'wsdl/%s' % API_VERSION)
 
         payline_api = getattr(settings, 'PAYLINE_API', 'DirectPayment')
         if payline_api not in ('DirectPayment', 'WebPayment', 'MassPayment'):
@@ -221,7 +224,13 @@ class PaylineProcessor(object):
 
     def get_web_payment_details(self, token):
         result = self.client.service.getWebPaymentDetails(
-            version=3,
+            # XXX Wot??? "version=3"  ???
+            # XXX from the doc https://payline.atlassian.net/wiki/spaces/DT/pages/1052411285/Webservice+-+getWebPaymentDetailsRequest
+            # version: Payline web services version. To be valued with the latest version: see the table of versions.
+            # NB: atm, just switching this to v4 doesn't make much difference... I suspect this isn't even used
+            # by their webservice :-/
+            #version=3, 
+            version=4, 
             token=token,
         )
         return (result.result.code == self.PAYMENT_SUCCESS, result)
